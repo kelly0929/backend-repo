@@ -4,7 +4,7 @@ print("platform", platform.uname())
 
 
 from sqlalchemy import create_engine, insert, delete, update, select
-import sqlalchemy
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
 import json
 import pandas as pd
@@ -23,7 +23,7 @@ def myinsert(mymodel, values):
         with session.begin():
             # データの挿入
             result = session.execute(query)
-    except sqlalchemy.exc.IntegrityError:
+    except IntegrityError:
         print("一意制約違反により、挿入に失敗しました")
         session.rollback()
 
@@ -52,7 +52,7 @@ def myselect(mymodel, customer_id):
             })
         # リストをJSONに変換
         result_json = json.dumps(result_dict_list, ensure_ascii=False)
-    except sqlalchemy.exc.IntegrityError:
+    except IntegrityError:
         print("一意制約違反により、挿入に失敗しました")
 
     # セッションを閉じる
@@ -71,7 +71,7 @@ def myselectAll(mymodel):
             df = pd.read_sql_query(query, con=engine)
             result_json = df.to_json(orient='records', force_ascii=False)
 
-    except sqlalchemy.exc.IntegrityError:
+    except IntegrityError:
         print("一意制約違反により、挿入に失敗しました")
         result_json = None
 
@@ -92,7 +92,7 @@ def myupdate(mymodel, values):
         # トランザクションを開始
         with session.begin():
             result = session.execute(query)
-    except sqlalchemy.exc.IntegrityError:
+    except IntegrityError:
         print("一意制約違反により、挿入に失敗しました")
         session.rollback()
     # セッションを閉じる
@@ -109,7 +109,7 @@ def mydelete(mymodel, customer_id):
         # トランザクションを開始
         with session.begin():
             result = session.execute(query)
-    except sqlalchemy.exc.IntegrityError:
+    except IntegrityError:
         print("一意制約違反により、挿入に失敗しました")
         session.rollback()
 
